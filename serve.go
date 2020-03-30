@@ -9,6 +9,7 @@ import (
 
 var (
 	filter *sensitive.Filter
+	e *echo.Echo
 )
 
 /**
@@ -51,7 +52,7 @@ func main() {
 	// 从文件载入到内存
 	initStore()
 
-	e := echo.New()
+	e = echo.New()
 
 	e.POST("/replace", replace)
 	e.POST("/filter", filterWord)
@@ -61,7 +62,7 @@ func main() {
 	e.POST("/delWord", delWord)
 
 	// 启动
-	e.Logger.Fatal(e.Start(":8090"))
+	e.Logger.Fatal(e.Start(":80"))
 }
 
 /**
@@ -71,7 +72,11 @@ func initStore() {
 	fmt.Println("data start load...")
 
 	filter = sensitive.New()
-	filter.LoadWordDict("dic/mgc.txt")
+	err := filter.LoadWordDict("dic/mgc.txt")
+	if err != nil {
+		e.Logger.Error(err.Error())
+		fmt.Println(err.Error())
+	}
 
 	fmt.Println("data loaded success")
 }
